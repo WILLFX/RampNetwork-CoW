@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ramp Onramp + CowSwap</title>
+
+  <!-- CowSwap Widget Script -->
+  <script src="https://cdn.jsdelivr.net/npm/@cowprotocol/widget-lib@latest/index.iife.js"></script>
+
+  <!-- Ramp SDK Script (v4.0.5 UMD version) -->
+  <script src="https://cdn.jsdelivr.net/npm/@ramp-network/ramp-instant-sdk@4.0.5/dist/ramp-instant-sdk.umd.js"
+    integrity="sha256-+ZKtflAhoWOQqb8SMBw2VK4k3BWzIM1/DkzyiFnYUjA="
+    crossorigin="anonymous"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 40px 12px;
+      text-align: center;
+      background: #fff;
+    }
+    h1 {
+      margin-top: 0;
+    }
+    .widget-frame {
+      width: 100%;
+      max-width: 500px;
+      height: 660px;
+      border: none;
+      margin: 30px auto;
+      display: block;
+    }
+    #cowwrap {
+      max-width: 500px;
+      margin: 30px auto;
+    }
+    button {
+      cursor: pointer;
+      padding: 10px 26px;
+      border: 1px solid #000;
+      border-radius: 4px;
+      background: #fff;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Buy xDai → Swap to xBZZ</h1>
+
+  <!-- Step 1: Ramp Onramp -->
+  <button id="buyButton">Click here to buy xDai</button>
+
+  <!-- Step 2: CowSwap swap widget -->
+  <div id="cowwrap"></div>
+
+  <script>
+    // CowSwap Widget
+    (function initCowSwap() {
+      const provider = window.ethereum;
+      const params = {
+        appCode: "xDai2xBZZ",
+        width: "100%",
+        height: "640px",
+        chainId: 100,
+        tokenLists: [
+          "https://files.cow.fi/tokens/CoinGecko.json",
+          "https://files.cow.fi/tokens/CowSwap.json"
+        ],
+        tradeType: "swap",
+        sell: { asset: "xdai", amount: "0" },
+        buy: { asset: "bzz", amount: "10" },
+        enabledTradeTypes: ["swap"],
+        theme: { baseTheme: "dark", primary: "#2c2b20" },
+        hideOrdersTable: true
+      };
+      cowSwapWidget.createCowSwapWidget(
+        document.getElementById("cowwrap"),
+        { params, provider }
+      );
+    })();
+
+    // Ramp Onramp Button Logic
+    const buyBtn = document.getElementById('buyButton');
+    buyBtn.addEventListener('click', async () => {
+      try {
+        const provider = window.ethereum;
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        const userAddress = accounts[0];
+
+        new rampInstantSdk.RampInstantSDK({
+          hostAppName: "xDai Onramp",
+          hostLogoUrl: "https://res.cloudinary.com/dne6ra8dd/image/upload/v1713622647/swarm-logo_csp_ok.png", // ✅ Local image file, avoids CSP
+          url: "https://app.demo.ramp.network", // ✅ DEV mode
+          userAddress: userAddress
+        })
+        .on("*", (event) => console.log("[Ramp Event]", event))
+        .show();
+
+      } catch (err) {
+        console.error("Ramp Error:", err);
+        alert("Ramp Error: " + (err.message || err));
+      }
+    });
+  </script>
+</body>
+</html>
