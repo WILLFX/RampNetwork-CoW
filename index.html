@@ -81,7 +81,7 @@
       );
     })();
 
-    // Ramp Onramp Button Logic
+    // Ramp Onramp Button Logic with dynamic base64 logo
     const buyBtn = document.getElementById('buyButton');
     buyBtn.addEventListener('click', async () => {
       try {
@@ -89,10 +89,16 @@
         const accounts = await provider.request({ method: 'eth_requestAccounts' });
         const userAddress = accounts[0];
 
+        // Fetch Base64 logo from GitHub raw URL
+        const base64LogoUrl = "https://raw.githubusercontent.com/WILLFX/RampNetwork-CoW/main/swarm_logo_base64.txt";
+        const logoResponse = await fetch(base64LogoUrl);
+        const logoBase64 = await logoResponse.text();
+
+        // Launch Ramp with base64 logo
         new rampInstantSdk.RampInstantSDK({
           hostAppName: "xDai Onramp",
-          hostLogoUrl: "https://res.cloudinary.com/dne6ra8dd/image/upload/v1713622647/swarm-logo_csp_ok.png", // ✅ Local image file, avoids CSP
-          url: "https://app.demo.ramp.network", // ✅ DEV mode
+          hostLogoUrl: logoBase64.trim(),
+          url: "https://app.demo.ramp.network",
           userAddress: userAddress
         })
         .on("*", (event) => console.log("[Ramp Event]", event))
