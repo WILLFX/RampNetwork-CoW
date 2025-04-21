@@ -105,18 +105,19 @@
         const accounts = await provider.request({ method: 'eth_requestAccounts' });
         const userAddress = accounts && accounts[0];
 
-        console.log("👛 Ramp will use this userAddress:", userAddress);
-
         if (!userAddress) {
           alert("Could not detect a valid wallet address. Please connect MetaMask.");
           return;
         }
 
+        console.log("👛 Ramp will use this userAddress:", userAddress);
+
         new rampInstantSdk.RampInstantSDK({
           hostAppName: "xDai Onramp",
           hostLogoUrl: "https://drive.google.com/uc?export=view&id=1lHhl-zT0uMZVMU1MDsdPiVWrGk7nkFEJ",
           url: "https://app.demo.ramp.network",
-          userAddress: userAddress
+          userAddress: userAddress,
+          
         })
         .on("*", (event) => console.log("[Ramp Event]", event))
         .show();
